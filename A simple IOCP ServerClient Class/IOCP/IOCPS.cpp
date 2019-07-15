@@ -274,12 +274,12 @@ UINT IOCPS::ListnerThreadProc(LPVOID pParam)
 			if(pThis->m_bShutDown)
 				break;
 
-			// Om Det inte hände något hoppa upp så att vi kollar om vi ska dö. 
+			// Om Det inte hände något hoppa upp s?att vi kollar om vi ska d? 
 			if (dwRet == WSA_WAIT_TIMEOUT)
 				continue;
 
 			//
-			// Titta på vad som har hänt.. 
+			// Titta p?vad som har hänt.. 
 			//
 			WSANETWORKEVENTS events;
 			int nRet = WSAEnumNetworkEvents(pThis->m_socListen,
@@ -689,7 +689,7 @@ void IOCPS::FreeClientContext()
 
 			ReleaseBuffer(pContext->m_pBuffOverlappedPackage);
 #ifdef TRANSFERFILEFUNCTIONALITY		
-			if (pContext->m_File.m_hFile != (unsigned int)INVALID_HANDLE_VALUE)
+			if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 			{
 
 				pContext->m_File.Close();
@@ -922,7 +922,7 @@ void IOCPS::OnReadCompleted(ClientContext *pContext, DWORD dwIoSize,CIOCPBuffer 
 		// That contains the size of the message. 
 		//
 		/*
-		* Lock the context so that no other thread enters “ProcessPackage” function, 
+		* Lock the context so that no other thread enters “ProcessPackage?function, 
 		* this is necessary to process the package in order. (When IOCP is used with 
 		* several working IO threads the packages can be processed in wrong order (even 
 		* if the TCP protocol guarantees ordered stream) because of the operative 
@@ -2492,7 +2492,7 @@ ClientContext* IOCPS::AllocateContext()
 	pContext->m_iMaxFileBytes=-1;
 	pContext->m_iFileBytes=-1;
 
-	if (pContext->m_File.m_hFile != (unsigned int)INVALID_HANDLE_VALUE)
+	if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 		pContext->m_File.Close();
 #endif	
 
@@ -2657,7 +2657,7 @@ inline BOOL IOCPS::ReleaseClientContext(ClientContext *pContext)
 			NotifyContextRelease(pContext);
 			ReleaseBuffer(pContext->m_pBuffOverlappedPackage);
 #ifdef TRANSFERFILEFUNCTIONALITY		
-			if (pContext->m_File.m_hFile != (unsigned int)INVALID_HANDLE_VALUE)
+			if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 			{
 
 				pContext->m_File.Close();
@@ -3310,7 +3310,7 @@ BOOL IOCPS::PrepareSendFile(ClientContext *pContext, LPCTSTR lpszFilename)
 		pContext->m_ContextLock.Lock();
 		pContext->m_bFileSendMode=TRUE;
 		// close file if it's already open
-		if (pContext->m_File.m_hFile != (int)INVALID_HANDLE_VALUE)
+		if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 		{
 			pContext->m_File.Close();
 		}
@@ -3405,7 +3405,7 @@ BOOL IOCPS::DisableSendFile(ClientContext *pContext)
 	pContext->m_ContextLock.Lock();
 	// close file if it's already open
 	//if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
-	if (pContext->m_File.m_hFile != (int)INVALID_HANDLE_VALUE)
+	if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 	{
 		pContext->m_File.Close();
 	}
@@ -3423,7 +3423,7 @@ BOOL IOCPS::DisableReceiveFile(ClientContext *pContext)
 	pContext->m_ContextLock.Lock();
 	// close file if it's already open
 	//if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
-	if (pContext->m_File.m_hFile != (int)INVALID_HANDLE_VALUE)
+	if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 	{
 		pContext->m_File.Close();
 	}
@@ -3460,7 +3460,7 @@ BOOL IOCPS::PrepareReceiveFile(ClientContext *pContext, LPCTSTR lpszFilename,DWO
 		pContext->m_ContextLock.Lock();
 		// close file if it's already open
 		//if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
-		if (pContext->m_File.m_hFile != (int)INVALID_HANDLE_VALUE)
+		if (pContext->m_File.m_hFile != INVALID_HANDLE_VALUE)
 		{
 			pContext->m_File.Close();
 		}
