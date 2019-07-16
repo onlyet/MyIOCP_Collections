@@ -121,11 +121,8 @@ BOOL IOCPS::Startup()
 		msg.Format("Maximum nr of simultaneous connections: %i",m_iMaxNumConnections);
 		AppendLog(msg);
 
-
 		msg.Format("Number of pendling asynchronous reads: %d",m_iNumberOfPendlingReads);
 		AppendLog(msg);
-
-
 
 		// No need to make in order read or write
 		if ( m_iMaxIOWorkers==1 )
@@ -169,7 +166,6 @@ BOOL IOCPS::Startup()
 		}
 		// Setup the IOWorkers.. 
 		bRet&=SetupIOWorkers();
-
 
 		if ( bRet )
 		{
@@ -370,8 +366,6 @@ UINT IOCPS::IOWorkerThreadProc(LPVOID pParam)
 			// Simulate workload (for debugging, to find possible reordering)
 			//Sleep(20);
 
-
-
 			// If Something whent wrong..
 			if (!bIORet)  
 			{
@@ -397,7 +391,8 @@ UINT IOCPS::IOWorkerThreadProc(LPVOID pParam)
 							TRACE(">IOWORKER1 (%x)\r\n",lpClientContext);
 							pThis->ReleaseClientContext(lpClientContext); //Later Implementati
 
-						}else
+						}
+                        else
 						{ // Should not get here if we do: disconnect the client and cleanup & report. 
 
 							pThis->AppendLog(pThis->ErrorCode2Text(dwIOError)); 
@@ -427,8 +422,6 @@ UINT IOCPS::IOWorkerThreadProc(LPVOID pParam)
 					continue;
 				}
 			}
-
-
 
 			if(bIORet && lpOverlapped && lpClientContext) 
 			{
@@ -483,17 +476,13 @@ BOOL IOCPS::AssociateIncomingClientWithContext(SOCKET clientSocket)
 	m_ContextMapLock.Lock(); // Mus lock the m_ContextMapLock Protect (m_NumberOfActiveConnections) ??
 	if(m_NumberOfActiveConnections>=m_iMaxNumConnections)
 	{
-
-		//
 		// Disconnect. 
-		//
 		LINGER lingerStruct;
 		lingerStruct.l_onoff = 1;
 		lingerStruct.l_linger = 0;
 		setsockopt( clientSocket, SOL_SOCKET, SO_LINGER,
 			(char *)&lingerStruct, sizeof(lingerStruct) );
 
-		//
 		// Now close the socket handle. This will do an abortive or graceful close, as requested. 
 		CancelIo((HANDLE) clientSocket);
 
@@ -583,14 +572,16 @@ BOOL IOCPS::AssociateIncomingClientWithContext(SOCKET clientSocket)
 				ReleaseClientContext(pContext);
 				return FALSE;
 			}
-		}else
+		}
+        else
 		{
 			CString msg;
 			msg.Format("ERROR HASHMAP AddClientContext failed.  %s",ErrorCode2Text(WSAGetLastError()));
 			AppendLog(msg);
 			return FALSE;
 		}
-	}else
+	}
+    else
 	{
 		CString msg;
 		msg.Format("ERROR Could not allocate memory for Context in Acceptincoming: %s",ErrorCode2Text(WSAGetLastError()));
@@ -1525,10 +1516,7 @@ void IOCPS::DisconnectClient(ClientContext *pContext, BOOL bGraceful)
 		// If we have an active  socket close it. 
 		if(bDisconnect)
 		{		
-
-			//
 			// Remove it From m_ContextMap. 
-			//
 			m_ContextMapLock.Lock();
 			BOOL bRet=FALSE;
 			//Remove it from the m_ContextMapLock,, 
@@ -1935,7 +1923,8 @@ BOOL IOCPS::AZeroByteRead(ClientContext *pContext, CIOCPBuffer *pOverlapBuff)
 			return FALSE;
 		}
 
-	}else
+	}
+    else
 	{
 		TRACE(">OnZeroByteRead2(%x)\r\n",pContext);
 		ReleaseBuffer(pOverlapBuff);
@@ -2029,8 +2018,8 @@ CString IOCPS::ErrorCode2Text(DWORD dw)
 
 
 /*
-* Notifyes that this Client Context Strukture is currently in the 
-* IOCompetetion lopp and are used by a another thread. 
+* Notify that this Client Context Structure is currently in the 
+* IOCompetetion loop and are used by a another thread. 
 * This funktion and ExitIOLoop is used to avoid possible Access Violation 
 */
 void IOCPS::EnterIOLoop(ClientContext *pContext)
@@ -2038,7 +2027,7 @@ void IOCPS::EnterIOLoop(ClientContext *pContext)
 	if(pContext!=NULL)
 	{
 		pContext->m_ContextLock.Lock();
-		pContext->m_nNumberOfPendlingIO++;
+		++pContext->m_nNumberOfPendlingIO;
 		pContext->m_ContextLock.Unlock();
 	}
 }
@@ -2516,8 +2505,6 @@ CIOCPBuffer *IOCPS::AllocateBuffer(int nType)
 	CIOCPBuffer *pBuff=NULL;
 	//
 	// Try to Get a buffer from the freebuffer list.  
-	//
-
 	m_FreeBufferListLock.Lock();
 	int dummy=m_FreeBufferList.GetCount();
 	if(!m_FreeBufferList.IsEmpty())
@@ -3317,8 +3304,14 @@ BOOL IOCPS::PrepareSendFile(ClientContext *pContext, LPCTSTR lpszFilename)
 
 		// open source file
 		//if (!pContext->m_File.Open(lpszFilename, CFile::modeRead | CFile::typeBinary | CFile::osSequentialScan))
-		if (!pContext->m_File.Open(lpszFilename, CFile::modeRead | CFile::typeBinary ))
+        CFileException e;
+		if (!pContext->m_File.Open(lpszFilename, CFile::modeRead, &e))
 		{
+            TCHAR szError[1024];
+            e.GetErrorMessage(szError, 1024);
+            CString msg;
+            msg.Format("CFile Open failed with error: %s", szError);
+            AppendLog(msg);
 			pContext->m_ContextLock.Unlock();
 			return FALSE;
 		}

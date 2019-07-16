@@ -821,7 +821,8 @@ void CIOCPDlg::OnBnClickedSendfile()
 		CString sFilename="";
 		
 		sPath=dlg.GetPathName();
-		sFilename=dlg.GetFileName();
+		//sFilename=dlg.GetFileName();
+        sFilename = dlg.GetPathName();
 		//sPath+=sFilename;
 		if(m_iocp.BuildFilePackageAndSend(m_iCurrentClientID,sFilename))
 		{

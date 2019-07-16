@@ -27,7 +27,7 @@ public:
 	volatile BOOL m_bFlood;
 	CString m_sSendText;
 
-	HWND m_hWnd;
+	HWND m_hWnd;    //CIOCPDlg::m_hWnd，用于发消息给对话框
 	MyIOCP();
 	virtual ~MyIOCP();
 	// A client have Disconnected. 

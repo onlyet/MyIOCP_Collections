@@ -291,7 +291,7 @@ private:
 	HANDLE					m_hEvent; 
 	// Socket som vi använder för att lyssna... 
 	SOCKET					m_socListen;   
-	// Tråden som lyssnar på connections 
+	// Tråden som lyssnar p?connections 
 
 	CWinThread* m_pListenThread;
 
