@@ -59,7 +59,6 @@ typedef CMap<unsigned int, unsigned int&, CIOCPBuffer *, CIOCPBuffer * > BufferM
 
 /*
 * Type of operations. 
-*
 */
 enum IOType 
 {
@@ -76,8 +75,6 @@ enum IOType
 
 /*
 * Type of Jobs. 
-*
-* 
 */
 
 enum JobType
@@ -90,8 +87,6 @@ enum JobType
 
 /*
 * This is what We put in the JobQueue
-*
-*
 */
 
 struct JobItem
@@ -101,12 +96,9 @@ struct JobItem
 	CString m_Data;
 };
 
-
-
 /*
 * This struct is used to past around some information about the 
 * client. 
-*
 */
 struct ClientContext
 {
@@ -145,16 +137,18 @@ struct ClientContext
 	CString m_sReceived;
 	int m_iNumberOfReceivedMsg;
 	BOOL m_bUpdate;
-
 };
-
-
-
-
-
 
 class IOCPS  
 {
+public:
+    IOCPS();
+    virtual ~IOCPS();
+
+    // Starts the server. 
+    BOOL Startup();
+    // ShutDowns The Server. 
+    void ShutDown();
 
 private:
 	// Aborts A socket without removing it from contextmap.	
@@ -192,7 +186,6 @@ private:
 	// Disables file receive. 
 	inline BOOL DisableReceiveFile(ClientContext *pContext);
 #endif	
-
 
 #ifdef SIMPLESECURITY	
 public:
@@ -303,7 +296,6 @@ private:
 	CCriticalSection m_FreeContextListLock;
 	CPtrList m_FreeContextList;
 
-
 	// Free Buffer List.. 
 	CCriticalSection m_FreeBufferListLock;
 	CPtrList m_FreeBufferList;
@@ -311,7 +303,6 @@ private:
 	// OccupiedBuffer List.. (Buffers that is currently used) 
 	CCriticalSection m_BufferListLock;
 	CPtrList m_BufferList;
-
 
 	// Maximum number of buffer which is not used. 
 	int m_iMaxNumberOfFreeBuffer;
@@ -392,9 +383,6 @@ public:
 	// Starts the server, 
 	BOOL Start(int nPort=999,int iMaxNumConnections=1201,int iMaxIOWorkers=1,int nOfWorkers=0,int iMaxNumberOfFreeBuffer=100,int iMaxNumberOfFreeContext=50,BOOL bOrderedSend=TRUE, BOOL bOrderedRead=TRUE,int iNumberOfPendlingReads=5);
 
-	IOCPS();
-	virtual ~IOCPS();
-
 	// Called to do some work. 
 	virtual inline void ProcessJob(JobItem *pJob,IOCPS* pServer);
 	// Get a Job. 
@@ -412,16 +400,8 @@ public:
 
 	BOOL ASend(int ClientId,CIOCPBuffer *pOverlapBuff);
 
-
-
 	// Finds a clien in the Client context Hashmap (NOT THREAD SAFE)..
 	ClientContext* FindClient(unsigned iClient);
-
-	// ShutDowns The Server. 
-	void ShutDown();
-
-	// Starts the server. 
-	BOOL Startup();
 
 	// We put all the Context (Open connections) into this String2Pointer HashMap. 
 	CCriticalSection m_ContextMapLock;
@@ -429,6 +409,7 @@ public:
 
 	// return the Key (The hostnamn+ socketnr) of a socket. (must be Unique). 
 	CString GetHostKeyName(SOCKET socket);	
+
 protected:
 	volatile int m_NumberOfActiveConnections;
 	// Called when a new connection have been established.. 
@@ -458,7 +439,5 @@ protected:
 
 	// Error Convertion.. 
 	CString ErrorCode2Text(DWORD dw);
-
-
 };
 #endif // !defined(AFX_MYIOCPSERVER_H__4D63F25E_B852_46D7_9A42_CF060F5E544D__INCLUDED_)

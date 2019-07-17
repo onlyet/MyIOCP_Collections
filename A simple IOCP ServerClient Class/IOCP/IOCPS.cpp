@@ -79,15 +79,12 @@ BOOL IOCPS::Startup()
 	m_BanIPList.RemoveAll();
 #endif
 
-
 	CString msg;
 	AppendLog(m_sServerVersion);
 	AppendLog("---------------------------------");
 	AppendLog("Starting system..");
 
-
 	m_NumberOfActiveConnections=0;
-
 
 	if ( m_iWSAInitResult != NO_ERROR )
 	{
@@ -544,7 +541,7 @@ BOOL IOCPS::AssociateIncomingClientWithContext(SOCKET clientSocket)
 			// IO_MESSAGE_HANDLER
 
 			// Important!! EnterIOLoop must notify that the socket and the structure  
-			// pContext have an Pendling IO operation ant should not be deleted.
+			// pContext have an Pendling IO operation and should not be deleted.
 			// This is nessesary to avoid Access violation. 
 			//
 			EnterIOLoop(pContext);
@@ -1539,16 +1536,12 @@ void IOCPS::DisconnectClient(ClientContext *pContext, BOOL bGraceful)
 #ifdef SIMPLESECURITY
 			if(m_bOneIPPerConnection)
 			{
-
-				//
 				//  Remove the IP address from list.. 
 				//	
-
 				sockaddr_in sockAddr;
 				memset(&sockAddr, 0, sizeof(sockAddr));
 				int nSockAddrLen = sizeof(sockAddr);	
 				int iResult = getpeername(pContext->m_Socket,(SOCKADDR*)&sockAddr, &nSockAddrLen);
-
 
 				if (iResult != INVALID_SOCKET)
 				{
@@ -1564,11 +1557,8 @@ void IOCPS::DisconnectClient(ClientContext *pContext, BOOL bGraceful)
 
 			}
 #endif	
-
-			//
 			// If we're supposed to abort the connection, set the linger value
 			// on the socket to 0.
-			//
 			if ( !bGraceful ) 
 			{
 
@@ -2618,9 +2608,7 @@ inline BOOL IOCPS::ReleaseClientContext(ClientContext *pContext)
 	if(pContext!=NULL)
 	{
 
-		// 
 		// We are removing this pContext from the penling IO port. 
-		// 
 		int nNumberOfPendlingIO=ExitIOLoop(pContext);
 
 		// We Should not get an EnterIOLoopHere Because the client are disconnected. 
@@ -2636,10 +2624,7 @@ inline BOOL IOCPS::ReleaseClientContext(ClientContext *pContext)
 		// If no one else is using this pContext and we are the only owner. Delete it. 
 		if(nNumberOfPendlingIO==0)
 		{
-			//
 			// Remove it From m_ContextMap. 
-			//
-
 			pContext->m_ContextLock.Lock();
 			NotifyContextRelease(pContext);
 			ReleaseBuffer(pContext->m_pBuffOverlappedPackage);
@@ -2658,9 +2643,9 @@ inline BOOL IOCPS::ReleaseClientContext(ClientContext *pContext)
 			ReleaseBufferMap(&pContext->m_SendBufferMap);
 			// Added. 
 			pContext->m_CurrentReadSequenceNumber=0;
+			pContext->m_CurrentSendSequenceNumber=0;
 			pContext->m_ReadSequenceNumber=0;
 			pContext->m_SendSequenceNumber=0;
-			pContext->m_CurrentSendSequenceNumber=0;
 			pContext->m_ContextLock.Unlock();
 
 			// Move the Context to the free context list (if Possible). 
